@@ -11,8 +11,6 @@ struct __group {
 /* Two dimensional array of pointers to stones */
 struct __stone ***board;
 
-#define ARRAY_SIZE(x)	(sizeof(x)/sizeof(x[0]))
-
 /* Global configuration */
 static struct __config {
 	int size;
@@ -68,8 +66,6 @@ void setup()
 	int i = 0;
 	while (i < config.size)
 		board[i++] = (struct __stone**)malloc(config.size * sizeof(struct __stone*));
-
-	printf("Board has size %lu\n", ARRAY_SIZE(*board));
 }
 
 void teardown()
@@ -87,6 +83,36 @@ void teardown()
 	s->color = c;						\
 } while(0)
 
+#define friends(s, t)	(s->color == t->color)
+
+int can_place(int x, int y, short color)
+{
+	/* step thru (x-1,y), (x,y-1), (x+1,y), (x,y+1) */
+	struct __stone *s;
+	
+	if (x-1 >= 0) {
+		s = board[x-1][y];
+		if (!s || s->color == color)
+			return 1;
+	}
+	if (x+1 < config.size) {
+		s = board[x+1][y];
+		if (!s || s->color == color)
+			return 1;
+	}
+	if (y-1 >= 0) {
+		s = board[x][y-1];
+		if (!s || s->color == color)
+			return 1;
+	}
+	if (y+1 < config.size) {
+		s = board[x][y+1];
+		if (!s || s->color == color)
+			return 1;
+	}
+	return 0;
+}
+
 /* Return 1 for successfully placing a stone, 0 otherwise */
 int place_stone(struct __stone *s, int x, int y)
 {
@@ -101,7 +127,16 @@ int place_stone(struct __stone *s, int x, int y)
 		goto fail;
 	}
 
+	/* TODO Figure out how many liberties, friends and foes there are. */
+
+	/* TODO It is not as simple as this... */
+	if (!can_place(x, y, s->color)) {
+		fprintf(stderr, "The stone placed there will not have any liberties, which is not allowed.\n");
+		goto fail;
+	}
+
 	board[x][y] = s;
+
 	return 1;
 
 fail:
