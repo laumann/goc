@@ -2,14 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BLACK	0
-#define WHITE	1
-#define iswhite(x)	(x)
-
-struct __stone {
-	short color;	/* Either BLACK or WHITE */
-	struct __group *g;
-};
+#include "stone.h"
 
 struct __group {
 	struct __stone **st;
@@ -18,8 +11,10 @@ struct __group {
 /* Two dimensional array of pointers to stones */
 struct __stone ***board;
 
+#define ARRAY_SIZE(x)	(sizeof(x)/sizeof(x[0]))
+
 /* Global configuration */
-static struct {
+static struct __config {
 	int size;
 } config = {
 	.size = 13, /* Default board size */
@@ -48,6 +43,7 @@ void parse_cmd_args(int *argc, const char **argv[])
 		if (!strcmp(arg, "-s") || !strcmp(arg, "--size")) {
 			if (*argc < 2)
 				exit_missing_arg(arg);
+
 			(*argc)--;
 			(*argv)++;
 			if (!sscanf(**argv, "%d", &config.size)) {
@@ -72,6 +68,8 @@ void setup()
 	int i = 0;
 	while (i < config.size)
 		board[i++] = (struct __stone**)malloc(config.size * sizeof(struct __stone*));
+
+	printf("Board has size %lu\n", ARRAY_SIZE(*board));
 }
 
 void teardown()
