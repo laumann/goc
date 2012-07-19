@@ -4,6 +4,7 @@
 
 #include "stone.h"
 
+/* TODO Set up management of groups using (doubly) linked lists, define merging, etc... */
 struct __group {
 	struct __stone **st;
 };
@@ -39,6 +40,7 @@ void parse_cmd_args(int *argc, const char **argv[])
 		arg = (*argv)[0];
 
 		if (!strcmp(arg, "-s") || !strcmp(arg, "--size")) {
+			/* TODO Figure out why providing a different size results in a segfault */
 			if (*argc < 2)
 				exit_missing_arg(arg);
 
@@ -128,6 +130,10 @@ int place_stone(struct __stone *s, int x, int y)
 	}
 
 	/* TODO Figure out how many liberties, friends and foes there are. */
+
+	/* Hypothetically add the stone, compute the new setup and if the stone doesn't have any
+	 * liberties afterwards, then it's an illegal move.
+	 */
 
 	/* TODO It is not as simple as this... */
 	if (!can_place(x, y, s->color)) {
